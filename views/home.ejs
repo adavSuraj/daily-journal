@@ -1,0 +1,15 @@
+<%- include('partials/header'); -%> 
+
+<h1> Home </h1>
+
+<p> Have you ever had too many Internet tabs open at once? When your brain has too many tabs open at once, it’s often the result of trying to mentally juggle too many thoughts at the same time. Writing gives form to your ideas and gets them out of your head, freeing up bandwidth and preventing you from crashing your browser like a late night downward spiral on Wikipedia. <br> Get started by clicking on compose and write down your thoughts, click on read more and find the delete button at the bottom of the post in case you need to delete anything. Good luck! </p>
+
+
+
+
+<%   posts.forEach(function(post){ %>
+  <h1> <%= post.postTitle %></a> </h1>
+  <p> <%= post.content.substring(0,30) + ' ...' %> <a class="noStyle" href="/posts/<%= post.postTitle %>"> Read More</a> </p>
+  <%  }) %>
+
+
