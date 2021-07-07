@@ -1,4 +1,3 @@
-//jshint esversion:6
 require('dotenv').config();
 const express = require('express');
 const ejs = require('ejs');
@@ -28,10 +27,18 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-mongoose.connect('mongodb://localhost:27017/journalDB', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+const CONNECTION_URL = process.env.MONGO_URI;
+const PORT = process.env.PORT || 3000;
+
+mongoose
+  .connect(CONNECTION_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() =>
+    app.listen(PORT, () => console.log(`Server started on port ${PORT}`))
+  )
+  .catch((error) => console.log(error.message));
 
 const postSchema = {
   postTitle: String,
@@ -108,6 +115,7 @@ app.get('/', function (req, res) {
     User.findById({ _id: o_id }, function (err, userDetails) {
       if (err) {
         console.log(err);
+        res.status(404);
       } else {
         res.render('home', {
           posts: userDetails.posts,
@@ -150,6 +158,7 @@ app.get('/posts/:postId', function (req, res) {
     User.findById({ _id: o_id }, function (err, userDetails) {
       if (err) {
         console.log(err);
+        res.status(404);
       } else {
         let foundPost = userDetails.posts.find(function (foundTitle) {
           return foundTitle.postTitle === requestedId;
@@ -179,6 +188,7 @@ app.post('/register', function (req, res) {
     function (err, user) {
       if (err) {
         console.log(err);
+        res.status(401);
         res.redirect('/register');
       } else {
         passport.authenticate('local')(req, res, function () {
@@ -198,6 +208,7 @@ app.post('/login', function (req, res) {
   req.login(user, function (err) {
     if (err) {
       console.log(err);
+      res.status(401);
       res.redirect('/register');
     } else {
       passport.authenticate('local')(req, res, function () {
@@ -251,8 +262,4 @@ app.post('/delete', function (req, res) {
   } else {
     res.redirect('/gettingStarted');
   }
-});
-
-app.listen(3000, function () {
-  console.log('Server started on port 3000');
 });
